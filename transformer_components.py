@@ -410,25 +410,30 @@ def load_pt_en_data_100(input_language, output_language):
 
 def load_tokenizer(languages=['pt', 'en']):
     """
-    Loads specified tokenizers in the order provided.
+    Load specified tokenizers in the order provided by the `languages` parameter.
 
     Args:
-        languages (list): List defining the order of tokenizers to load.
+        languages (list): A list specifying the order of tokenizers to load.
                           Options: 'pt' for Portuguese, 'en' for English.
+                          Example: ['pt', 'en'], ['en', 'pt'], ['pt'], ['en'].
 
     Returns:
-        Tokenizer(s): Single tokenizer or tuple of tokenizers in requested order.
+        Tokenizer(s) in the specified order.
     """
+    # Define the model name
     model_name = 'ted_hrlr_translate_pt_en_converter'
 
+    # Download and extract the model files
     tf.keras.utils.get_file(
         f'{model_name}.zip',
         f'https://storage.googleapis.com/download.tensorflow.org/models/{model_name}.zip',
         cache_dir='.', cache_subdir='', extract=True
     )
 
+    # Load the tokenizers
     tokenizers = tf.saved_model.load('ted_hrlr_translate_pt_en_converter_extracted/ted_hrlr_translate_pt_en_converter')
 
+    # Fetch the requested tokenizers
     results = []
     for lang in languages:
         if lang == 'pt':
@@ -438,7 +443,10 @@ def load_tokenizer(languages=['pt', 'en']):
         else:
             raise ValueError(f"Invalid language '{lang}' provided. Use 'pt' or 'en'.")
 
-    return results[0] if len(results) == 1 else tuple(results)
+    # Return results
+    if len(results) == 1:
+        return results[0]  # Return single tokenizer if the list has one element
+    return tuple(results)  # Return tuple if multiple tokenizers are requested
 
 
 def prepare_batch(inputs, labels, input_tokenizer, output_tokenizer, max_tokens):
